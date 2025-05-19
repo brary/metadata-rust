@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  pd:
+    image: pingcap/pd:latest
+    command:
+      - --name=pd
+      - --data-dir=pd
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --initial-cluster=pd=http://pd:2380
+    ports:
+      - "2381:2379"
+      - "2380:2380"
+    networks:
+      - tikv-net
+
+  tikv:
+    image: pingcap/tikv:latest
+    command:
+      - --addr=0.0.0.0:20160
+      - --pd=pd:2379
+    depends_on:
+      - pd
+    ports:
+      - "20160:20160"
+    networks:
+      - tikv-net
+
+networks:
+  tikv-net:
+    driver: bridge 
